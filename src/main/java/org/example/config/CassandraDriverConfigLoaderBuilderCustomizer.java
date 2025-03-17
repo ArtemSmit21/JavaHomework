@@ -7,14 +7,14 @@ import org.springframework.stereotype.Component;
 
 import java.time.Duration;
 
-@Component
+@Configuration
 public class CassandraDriverConfigLoaderBuilderCustomizer implements DriverConfigLoaderBuilderCustomizer {
 
   @Override
   public void customize(ProgrammaticDriverConfigLoaderBuilder programmaticDriverConfigLoaderBuilder) {
     programmaticDriverConfigLoaderBuilder
-      .withDuration(DefaultDriverOption.REQUEST_TIMEOUT, Duration.ofSeconds(10))
-      .withDuration(DefaultDriverOption.CONNECTION_CONNECT_TIMEOUT, Duration.ofSeconds(10))
-      .withDuration(DefaultDriverOption.CONNECTION_INIT_QUERY_TIMEOUT, Duration.ofSeconds(10));
+      .withDuration(DefaultDriverOption.REQUEST_TIMEOUT, Duration.ofSeconds(20))
+      .withDuration(DefaultDriverOption.CONNECTION_CONNECT_TIMEOUT, Duration.ofSeconds(20))
+      .withDuration(DefaultDriverOption.CONNECTION_INIT_QUERY_TIMEOUT, Duration.ofSeconds(20));
   }
 }
