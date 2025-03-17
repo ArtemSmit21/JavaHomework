@@ -5,6 +5,7 @@ import com.datastax.oss.driver.api.core.cql.PreparedStatement;
 import com.datastax.oss.driver.api.core.CqlSession;
 import org.example.Main;
 import org.example.config.CassandraConnector;
+import org.example.config.CassandraDriverConfigLoaderBuilderCustomizer;
 import org.example.exceptions.UserNotFoundException;
 import org.example.models.UserAction;
 import org.junit.jupiter.api.Assertions;
