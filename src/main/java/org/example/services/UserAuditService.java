@@ -50,6 +50,8 @@ public class UserAuditService {
 
     ResultSet resultSet = session.execute(boundStatement);
 
+    session.close();
+
     List<UserAction> userActions = new ArrayList<>();
 
     for (Row row : resultSet) {
