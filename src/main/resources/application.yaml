@@ -6,5 +6,12 @@ spring:
     local-datacenter: datacenter1
     password: cassandra
     username: cassandra
+    connection:
+      connect-timeout: PT10S
+      init-query-timeout: PT10S
+    request:
+      timeout: PT10S
+    controlconnection:
+      timeout: PT10S
   autoconfigure:
     exclude: org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
