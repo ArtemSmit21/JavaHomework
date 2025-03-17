@@ -3,7 +3,7 @@ package org.example.config;
 import com.datastax.oss.driver.api.core.config.DefaultDriverOption;
 import com.datastax.oss.driver.api.core.config.ProgrammaticDriverConfigLoaderBuilder;
 import org.springframework.boot.autoconfigure.cassandra.DriverConfigLoaderBuilderCustomizer;
-import org.springframework.stereotype.Component;
+import org.springframework.context.annotation.Configuration;
 
 import java.time.Duration;
 
