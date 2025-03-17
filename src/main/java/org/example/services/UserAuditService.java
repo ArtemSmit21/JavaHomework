@@ -55,7 +55,6 @@ public class UserAuditService {
     List<UserAction> userActions = new ArrayList<>();
 
     for (Row row : resultSet) {
-
       userActions.add(new UserAction(
         row.getUuid("user_id"), row.getInstant("event_time"),
         row.getString("event_type"), row.getString("event_details")
