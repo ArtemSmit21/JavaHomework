@@ -57,6 +57,8 @@ public class UserAuditServiceTest {
 
     session.execute(boundStatement);
 
+    session.close();
+
     UserAction userServiceAction = userAuditService.readUserAudit(userAction.getId()).get(0);
 
     assertEquals(userAction.getId(), userServiceAction.getId());
