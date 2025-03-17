@@ -22,7 +22,7 @@ import static org.example.models.ActionType.INSERT;
 import static org.junit.jupiter.api.Assertions.*;
 
 @Testcontainers
-@SpringBootTest
+@SpringBootTest(classes = {Main.class, CassandraDriverConfigLoaderBuilderCustomizer.class})
 public class UserAuditServiceTest {
 
   @Container
