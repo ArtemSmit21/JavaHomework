@@ -3,7 +3,9 @@ package org.example.services;
 import com.datastax.oss.driver.api.core.cql.BoundStatement;
 import com.datastax.oss.driver.api.core.cql.PreparedStatement;
 import com.datastax.oss.driver.api.core.CqlSession;
+import org.example.Main;
 import org.example.config.CassandraConnector;
+import org.example.config.CassandraDriverConfigLoaderBuilderCustomizer;
 import org.example.exceptions.UserNotFoundException;
 import org.example.models.UserAction;
 import org.junit.jupiter.api.Assertions;
@@ -11,6 +13,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ContextConfiguration;
 import org.testcontainers.containers.CassandraContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -23,6 +26,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @Testcontainers
 @SpringBootTest
+@ContextConfiguration(classes = {Main.class, CassandraDriverConfigLoaderBuilderCustomizer.class})
 public class UserAuditServiceTest {
 
   @Container
