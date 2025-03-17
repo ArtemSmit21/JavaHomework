@@ -13,7 +13,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ContextConfiguration;
 import org.testcontainers.containers.CassandraContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -25,8 +24,7 @@ import static org.example.models.ActionType.INSERT;
 import static org.junit.jupiter.api.Assertions.*;
 
 @Testcontainers
-@SpringBootTest
-@ContextConfiguration(classes = {Main.class, CassandraDriverConfigLoaderBuilderCustomizer.class})
+@SpringBootTest(classes = {Main.class, CassandraDriverConfigLoaderBuilderCustomizer.class})
 public class UserAuditServiceTest {
 
   @Container
