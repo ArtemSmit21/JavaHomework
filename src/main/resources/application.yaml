@@ -1,0 +1,15 @@
+spring:
+  cassandra:
+    contact-points: 127.0.0.1
+    port: 9042
+    keyspace-name: my_keyspace
+    local-datacenter: datacenter1
+    connection:
+      connect-timeout: PT10S
+      init-query-timeout: PT10S
+    request:
+      timeout: PT10S
+    control connection:
+      timeout: PT10S
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
