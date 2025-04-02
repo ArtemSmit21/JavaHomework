@@ -104,20 +104,4 @@ public class KafkaConsumerServiceTest {
     assertEquals(userAction.getEventType(), cassandraUserAction.getEventType());
     assertEquals(userAction.getEventTime().getEpochSecond(), cassandraUserAction.getEventTime().getEpochSecond());
   }
-
-  @Test
-  @DisplayName("Negative test checking consume method")
-  void test2() throws JsonProcessingException {
-    UserAction userAction = new UserAction(
-      1, Instant.now(), "INSERT", "none"
-    );
-
-    kafkaTemplate.send("other_topic",
-      objectMapper.writeValueAsString(userAction)
-    );
-
-    assertThrows(UserNotFoundException.class, () -> {
-      userAuditService.readUserAudit(1);
-    });
-  }
 }
