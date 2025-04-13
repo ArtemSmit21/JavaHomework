@@ -1,4 +1,3 @@
-
 spring:
   kafka:
     bootstrap-servers: localhost:29093
@@ -19,6 +18,5 @@ spring:
       timeout: PT10S
   autoconfigure:
     exclude: org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
-topic-to-consume-message: audit_topic
 server:
   port: 8083

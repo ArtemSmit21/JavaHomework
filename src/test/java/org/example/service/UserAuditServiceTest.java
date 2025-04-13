@@ -1,10 +1,5 @@
 package org.example.service;
 
-import com.datastax.oss.driver.api.core.cql.BoundStatement;
-import com.datastax.oss.driver.api.core.cql.PreparedStatement;
-import com.datastax.oss.driver.api.core.CqlSession;
-import org.example.CassandraConnector;
-import org.example.config.CassandraConfiguration;
 import org.example.config.CassandraDriverConfigLoaderBuilderCustomizer;
 import org.example.exception.UserNotFoundException;
 import org.example.model.UserAction;
@@ -20,6 +15,7 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.time.Instant;
+import java.util.List;
 
 import static org.example.model.ActionType.INSERT;
 import static org.junit.jupiter.api.Assertions.*;
@@ -51,20 +47,8 @@ public class UserAuditServiceTest {
   }
 
   @Test
-  @DisplayName("this test check read user audit by UUID method when user created")
+  @DisplayName("this test check read user audit by UUID method and insert user audit method")
   public void test1() {
-    CassandraConnector cassandraConnector = new CassandraConnector();
-    CassandraConfiguration cassandraConfiguration = new CassandraConfiguration();
-    cassandraConnector.connect(
-      System.getProperty("spring.cassandra.contact-points"),
-      Integer.parseInt(System.getProperty("spring.cassandra.port")),
-      System.getProperty("spring.cassandra.local-datacenter")
-    );
-    CqlSession session = cassandraConnector.getSession();
-
-    PreparedStatement preparedStatement = session.prepare(
-      "INSERT INTO my_keyspace.user_audit (user_id, event_time, event_type, event_details) VALUES (?, ?, ?, ?)"
-    );
 
     UserAction userAction = new UserAction(
       1,
@@ -73,44 +57,19 @@ public class UserAuditServiceTest {
       "insert into db"
     );
 
-    BoundStatement boundStatement = preparedStatement.bind(
-      userAction.getId(), userAction.getEventTime(), userAction.getEventType(), userAction.getEventDetails()
-    );
+    userAuditService.insertUserAction(userAction);
+    List<UserAction> userServiceAction = userAuditService.readUserAudit(userAction.getId());
 
-    session.execute(boundStatement);
-
-    session.close();
-
-    UserAction userServiceAction = userAuditService.readUserAudit(userAction.getId()).get(0);
-
-    assertEquals(userAction.getId(), userServiceAction.getId());
-    assertEquals(userAction.getEventTime().getEpochSecond(), userServiceAction.getEventTime().getEpochSecond());
-    assertEquals(userAction.getEventType(), userServiceAction.getEventType());
-    assertEquals(userAction.getEventDetails(), userServiceAction.getEventDetails());
+    assertEquals(userServiceAction.size(), 1);
+    assertEquals(userAction.getId(), userServiceAction.get(0).getId());
+    assertEquals(userAction.getEventTime().getEpochSecond(), userServiceAction.get(0).getEventTime().getEpochSecond());
+    assertEquals(userAction.getEventType(), userServiceAction.get(0).getEventType());
+    assertEquals(userAction.getEventDetails(), userServiceAction.get(0).getEventDetails());
   }
 
   @Test
   @DisplayName("this test check read user audit by UUID method when user is not created")
   public void test2() {
     Assertions.assertThrows(UserNotFoundException.class, () -> {userAuditService.readUserAudit(2);});
-  }
-
-  @Test
-  @DisplayName("this test check insert user action method")
-  public void test3() {
-    UserAction userAction = new UserAction(
-      3,
-      Instant.now(),
-      INSERT.getValue(),
-      "insert into db"
-    );
-
-    userAuditService.insertUserAction(userAction);
-    UserAction userServiceAction = userAuditService.readUserAudit(userAction.getId()).get(0);
-
-    assertEquals(userAction.getId(), userServiceAction.getId());
-    assertEquals(userAction.getEventTime().getEpochSecond(), userServiceAction.getEventTime().getEpochSecond());
-    assertEquals(userAction.getEventType(), userServiceAction.getEventType());
-    assertEquals(userAction.getEventDetails(), userServiceAction.getEventDetails());
   }
 }
