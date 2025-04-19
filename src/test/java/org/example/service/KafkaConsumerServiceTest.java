@@ -1,12 +1,12 @@
 package org.example.service;
 
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.example.config.CassandraDriverConfigLoaderBuilderCustomizer;
 import org.example.exception.UserNotFoundException;
 import org.example.model.UserAction;
+import org.junit.Assert;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -27,7 +27,6 @@ import org.testcontainers.utility.DockerImageName;
 import java.time.Instant;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThrows;
 
 @SpringBootTest(
   properties = {
@@ -86,7 +85,8 @@ public class KafkaConsumerServiceTest {
 
   @Test
   @DisplayName("This test check consume message method")
-  void test1() throws JsonProcessingException, InterruptedException {
+  void shouldAddUserAuditInfo() throws JsonProcessingException, InterruptedException {
+
     UserAction userAction = new UserAction(
       1, Instant.now(), "INSERT", "none"
     );
@@ -103,5 +103,21 @@ public class KafkaConsumerServiceTest {
     assertEquals(userAction.getEventDetails(), cassandraUserAction.getEventDetails());
     assertEquals(userAction.getEventType(), cassandraUserAction.getEventType());
     assertEquals(userAction.getEventTime().getEpochSecond(), cassandraUserAction.getEventTime().getEpochSecond());
+  }
+
+  @Test
+  @DisplayName("This test check consume message method (other topic)")
+  void shouldNotAddUserAuditInfo() throws JsonProcessingException, InterruptedException {
+
+    UserAction userAction = new UserAction(
+      2, Instant.now(), "INSERT", "none"
+    );
+
+    kafkaTemplate.send("other_topic",
+      objectMapper.writeValueAsString(userAction)
+    );
+
+    Thread.sleep(5000);
+    Assert.assertThrows(UserNotFoundException.class, () -> userAuditService.readUserAudit(2));
   }
 }

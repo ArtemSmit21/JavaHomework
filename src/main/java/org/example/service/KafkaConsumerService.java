@@ -22,10 +22,9 @@ public class KafkaConsumerService {
 
   @KafkaListener(topics = {"${topic-to-consume-message}"})
   public void consumeMessage(String message) throws JsonProcessingException {
-    message = message.substring(1, message.lastIndexOf("\"")).replaceAll("\\\\", "");
-    message = "{" + message + "\"}"; //only for tests
+    LOGGER.info("Retrieved message : {}", message);
     UserAction parsedMessage = objectMapper.readValue(message, UserAction.class);
     userAuditService.insertUserAction(parsedMessage);
-    LOGGER.info("Retrieved message : {}", message);
+    LOGGER.info("Processed message : {}", message);
   }
 }

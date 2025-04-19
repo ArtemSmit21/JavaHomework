@@ -5,10 +5,7 @@ import com.datastax.oss.driver.api.core.cql.BoundStatement;
 import com.datastax.oss.driver.api.core.cql.PreparedStatement;
 import com.datastax.oss.driver.api.core.cql.ResultSet;
 import com.datastax.oss.driver.api.core.cql.Row;
-import lombok.AllArgsConstructor;
-import org.example.CassandraConnector;
-import org.example.config.CassandraConfiguration;
-import org.example.exception.TestException;
+import jakarta.annotation.PostConstruct;
 import org.example.exception.UserNotFoundException;
 import org.example.model.UserAction;
 import org.springframework.stereotype.Service;
@@ -17,51 +14,39 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-@AllArgsConstructor
 public class UserAuditService {
 
-  private final CassandraConfiguration cassandraConfiguration;
+  private final CqlSession cqlSession;
 
-  public void insertUserAction(UserAction userAction) {
-    CassandraConnector cassandraConnector = new CassandraConnector();
-    cassandraConnector.connect(
-      cassandraConfiguration.getContactPoints(),
-      cassandraConfiguration.getPort(),
-      cassandraConfiguration.getLocalDatacenter()
-    );
-    CqlSession session = cassandraConnector.getSession();
+  private PreparedStatement insertUserAction;
 
-    PreparedStatement preparedStatement = session.prepare(
+  private PreparedStatement selectUserAction;
+
+  public UserAuditService(CqlSession cqlSession) {
+    this.cqlSession = cqlSession;
+  }
+
+  @PostConstruct
+  private void init() {
+    insertUserAction = cqlSession.prepare(
       "INSERT INTO my_keyspace.user_audit (user_id, event_time, event_type, event_details) VALUES (?, ?, ?, ?)"
     );
+    selectUserAction = cqlSession.prepare(
+      "SELECT * FROM my_keyspace.user_audit WHERE user_id = ?"
+    );
+  }
 
-    BoundStatement boundStatement = preparedStatement.bind(
+  public void insertUserAction(UserAction userAction) {
+    BoundStatement boundStatement = insertUserAction.bind(
       userAction.getId(), userAction.getEventTime(), userAction.getEventType(), userAction.getEventDetails()
     );
-
-    session.execute(boundStatement);
-
-    session.close();
+    cqlSession.execute(boundStatement);
   }
 
   public List<UserAction> readUserAudit(long id) {
-    CassandraConnector cassandraConnector = new CassandraConnector();
-    cassandraConnector.connect(
-      cassandraConfiguration.getContactPoints(),
-      cassandraConfiguration.getPort(),
-      cassandraConfiguration.getLocalDatacenter()
-    );
-    CqlSession session = cassandraConnector.getSession();
+    BoundStatement boundStatement = selectUserAction.bind(id);
 
-    PreparedStatement preparedStatement = session.prepare(
-      "SELECT * FROM my_keyspace.user_audit WHERE user_id = ?"
-    );
-
-    BoundStatement boundStatement = preparedStatement.bind(id);
-
-    ResultSet resultSet = session.execute(boundStatement);
-
-    session.close();
+    ResultSet resultSet = cqlSession.execute(boundStatement);
 
     List<UserAction> userActions = new ArrayList<>();
 
